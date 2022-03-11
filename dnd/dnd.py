@@ -1,24 +1,46 @@
 from redbot.core import commands
 import discord
+import aiohttp
+import asyncio
 
+BASE_URL = 'https://www.dnd5eapi.co/api'
+HEADERS = {'Accept': 'application/json'}
 class Dnd(commands.Cog):
-    """My custom cog"""
+    """Interact with dnd5eapi.co"""
 
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
-    async def spell(self, ctx: commands.Context, *, text: str):
-        """This does stuff!"""
-        embed = discord.Embed(color=(await ctx.embed_colour()))
-        embed.add_field(name="Name", value="Acid Arrow")
-        embed.add_field(name="Level", value="2")
-        embed.add_field(name="Casting Time", value="1 Action")
-        embed.add_field(name="Range/Area", value="90 ft")
-        embed.add_field(name="Components", value="V,S,M *")
-        embed.add_field(name="Duration", value="Instantaneous")
-        embed.add_field(name="School", value="Evocation")
-        embed.add_field(name="Attack/Save", value="Ranged")
-        embed.add_field(name="Damage/Effect", value="Acid")
-        embed.add_field(name="Description", value="A shimmering green arrow streaks toward a target within range and bursts in a spray of acid. Make a ranged spell attack against the target. On a hit, the target takes 4d4 acid damage immediately and 2d4 acid damage at the end of its next turn. On a miss, the arrow splashes the target with acid for half as much of the initial damage and no damage at the end of its next turn.")
-        await ctx.send(embed=embed)
+    async def spell(self, ctx: commands.Context, *, spell: str):
+        """Get info about a spell"""
+        index = spell.lower().replace(' ', '-')
+        try:
+            async with aiohttp.request('GET', f'{BASE_URL}/spells/{index}', headers=HEADERS) as resp:
+                if resp.status == 200:
+                    json = await resp.json()
+                    name = json.get('name')
+                    desc = '\n'.join(json.get('desc', []))
+                    higher_level = '\n'.join(json.get('higher_level', []))
+                    material = json.get('material')
+                    description = f'{desc}\n\n**At Higher Levels.** {higher_level}\n\n**Material.** {material}'
+
+                    embed = discord.Embed(title=f'Spell: {name}', color=(await ctx.embed_colour()))
+                    embed.add_field(name="Name", value=name)
+                    embed.add_field(name="Level", value=json.get('level'))
+                    embed.add_field(name="Casting Time", value=json.get('casting_time'))
+                    embed.add_field(name="Range/Area", value=json.get('range'))
+                    embed.add_field(name="Components", value=','.join(json.get('components', [])))
+                    embed.add_field(name="Duration", value=json.get('duration'))
+                    embed.add_field(name="School", value=json.get('school', {}).get('name'))
+                    embed.add_field(name="Attack/Save", value=json.get('attack_type'))
+                    embed.add_field(name="Damage/Effect", value=json.get('damage', {}).get('damage_type', {}).get('name'))
+                    embed.add_field(name="Description", value=description)
+                    return await ctx.send(embed=embed)
+                elif resp.status == 404:
+                    return await ctx.send(f'Could not find spell {spell}')
+                else:
+                    return await ctx.send('Oops! Something went wrong finding spells.')
+        except aiohttp.ClientConnectionError:
+            return await ctx.send('Oops! Something went wrong finding spells.')
+

@@ -83,6 +83,25 @@ class Dnd(commands.Cog):
             return await ctx.send('Oops! Something went wrong finding conditions.')
 
     @commands.command()
+    async def spells(self, ctx: commands.Context, *, level: str):
+        """List spells by level"""
+        try:
+            async with aiohttp.request('GET', f'{BASE_URL}/spells/?level={level}', headers=HEADERS) as resp:
+                if resp.status == 200:
+                    json = await resp.json()
+                    desc = ', '.join(list(map(lambda c: c.get('name'), json.get('results', []))))
+
+                    embed = discord.Embed(title=f'Spells', description=desc, color=(await ctx.embed_colour()))
+                    return await ctx.send(embed=embed)
+                elif resp.status == 404:
+                    return await ctx.send(f'Could not list spells')
+                else:
+                    return await ctx.send('Oops! Something went wrong listing spells.')
+        except aiohttp.ClientConnectionError:
+            return await ctx.send('Oops! Something went wrong listing spells.')
+
+
+    @commands.command()
     async def spell(self, ctx: commands.Context, *, spell: str):
         """Get info about a spell"""
         index = spell.lower().replace(' ', '-')

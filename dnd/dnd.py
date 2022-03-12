@@ -84,6 +84,22 @@ class Dnd(commands.Cog):
             return await ctx.send('Oops! Something went wrong finding conditions.')
 
     @commands.command()
+    async def classes(self, ctx: commands.Context):
+        """List character classes"""
+        try:
+            async with aiohttp.request('GET', f'{BASE_URL}/classes', headers=HEADERS) as resp:
+                if resp.status == 200:
+                    json = await resp.json()
+                    desc = ', '.join(list(map(lambda c: c.get('name'), json.get('results', []))))
+
+                    embed = discord.Embed(title=f'Classes', description=desc, color=(await ctx.embed_colour()))
+                    return await ctx.send(embed=embed)
+                else:
+                    return await ctx.send('Oops! Something went wrong listing character classes.')
+        except aiohttp.aiohttp.ClientConnectionError: 
+            return await ctx.send('Oops! Something went wrong listing character classes.')
+
+    @commands.command()
     async def spells(self, ctx: commands.Context, level: str, *, character_class = ""):
         """List spells by level and optionally class"""
         try:

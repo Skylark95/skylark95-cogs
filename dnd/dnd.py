@@ -29,7 +29,7 @@ class Dnd(commands.Cog):
 
     @commands.command(aliases=['magic'])
     async def school(self, ctx: commands.Context, *, school: str):
-        """Get info about a condition"""
+        """Get info about a magic school"""
         index = school.lower()
         try:
             async with aiohttp.request('GET', f'{BASE_URL}/magic-schools/{index}', headers=HEADERS) as resp:

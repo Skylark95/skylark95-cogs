@@ -84,22 +84,43 @@ class Dnd(commands.Cog):
             return await ctx.send('Oops! Something went wrong finding conditions.')
 
     @commands.command()
-    async def spells(self, ctx: commands.Context, *, level: str):
-        """List spells by level"""
+    async def spells(self, ctx: commands.Context, level: str, *, character_class = ""):
+        """List spells by level and optionally class"""
         try:
             level_num = int(level)
             if level_num < 0 or level_num > 9:
                 return await ctx.send("Spell level must be between 0-9")
         except ValueError:
             return await ctx.send("Spell level must be numeric")
+
+        class_spells = []
+        if character_class != "":
+            index = character_class.lower()
+            try:
+                async with aiohttp.request('GET', f'{BASE_URL}/classes/{index}/spells', headers=HEADERS) as resp:
+                    if resp.status == 200:
+                        json = await resp.json()
+                        class_spells = list(map(lambda c: c.get('name'), json.get('results', [])))
+                        if len(class_spells) == 0:
+                            return await ctx.send(f'Unknown character class {character_class}.')
+                    elif resp.status == 404:
+                        return await ctx.send(f'Unknown character class {character_class}.')
+                    else:
+                        return await ctx.send('Oops! Something went wrong listing spells.')
+            except aiohttp.ClientConnectionError:
+                return await ctx.send('Oops! Something went wrong listing spells.')
         
         try:
             async with aiohttp.request('GET', f'{BASE_URL}/spells/?level={level}', headers=HEADERS) as resp:
                 if resp.status == 200:
                     json = await resp.json()
-                    desc = ', '.join(list(map(lambda c: c.get('name'), json.get('results', []))))
-
-                    embed = discord.Embed(title=f'Spells: Level {level}', description=desc, color=(await ctx.embed_colour()))
+                    title = f'Spells: Level {level}'
+                    spells = list(map(lambda c: c.get('name'), json.get('results', [])))
+                    if len(class_spells) > 0:
+                        title = title + ' ' + character_class.capitalize()
+                        spells = sorted(list(set(spells) & set(class_spells)))
+                    desc = ', '.join(spells)
+                    embed = discord.Embed(title=title, description=desc, color=(await ctx.embed_colour()))
                     return await ctx.send(embed=embed)
                 else:
                     return await ctx.send('Oops! Something went wrong listing spells.')

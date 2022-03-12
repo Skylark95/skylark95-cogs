@@ -30,7 +30,7 @@ class Dnd(commands.Cog):
                     if material != None:
                         desc = desc + '\n\n**Material.** ' + material
 
-                    classes = ', '.join(list(map(lambda c: c.get('index'), json.get('classes', []))))
+                    classes = ', '.join(list(map(lambda c: c.get('name'), json.get('classes', []))))
 
                     embed = discord.Embed(title=f'Spell: {name}', description=desc, color=(await ctx.embed_colour()))
                     embed.add_field(name="Level", value=json.get('level'))

@@ -1,0 +1,9 @@
+{
+    "author": ["Skylark95"],
+    "description": "Interact with dnd5eapi.co",
+    "install_msg": "Interact with dnd5eapi.co",
+    "short": "Interact with dnd5eapi.co",
+    "tags": ["dnd", "5e"],
+    "type": "COG",
+    "end_user_data_statement": "This cog does not persistently store data or metadata about users."
+}

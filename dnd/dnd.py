@@ -11,6 +11,43 @@ class Dnd(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command(aliases=['magics'])
+    async def schools(self, ctx: commands.Context):
+        """List magic schools"""
+        try:
+            async with aiohttp.request('GET', f'{BASE_URL}/magic-schools', headers=HEADERS) as resp:
+                if resp.status == 200:
+                    json = await resp.json()
+                    desc = ', '.join(list(map(lambda c: c.get('name'), json.get('results', []))))
+
+                    embed = discord.Embed(title=f'Conditions', description=desc, color=(await ctx.embed_colour()))
+                    return await ctx.send(embed=embed)
+                else:
+                    return await ctx.send('Oops! Something went wrong listing magic schools.')
+        except aiohttp.aiohttp.ClientConnectionError: 
+            return await ctx.send('Oops! Something went wrong listing magic schools.')
+
+    @commands.command(aliases=['magic'])
+    async def school(self, ctx: commands.Context, *, school: str):
+        """Get info about a condition"""
+        index = school.lower()
+        try:
+            async with aiohttp.request('GET', f'{BASE_URL}/magic-schools/{index}', headers=HEADERS) as resp:
+                if resp.status == 200:
+                    json = await resp.json()
+                    name = json.get('name')
+                    desc = json.get('desc')
+
+                    embed = discord.Embed(title=f'Magic School: {name}', description=desc, color=(await ctx.embed_colour()))
+                    return await ctx.send(embed=embed)
+                elif resp.status == 404:
+                    return await ctx.send(f'Could not find magic school {school}')
+                else:
+                    return await ctx.send('Oops! Something went wrong finding magic schools.')
+        except aiohttp.aiohttp.ClientConnectionError: 
+            return await ctx.send('Oops! Something went wrong finding magic schools.')
+
+
     @commands.command()
     async def conditions(self, ctx: commands.Context):
         """List conditions"""

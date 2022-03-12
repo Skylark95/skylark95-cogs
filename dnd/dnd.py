@@ -20,13 +20,16 @@ class Dnd(commands.Cog):
                 if resp.status == 200:
                     json = await resp.json()
                     name = json.get('name')
-                    desc = '\n'.join(json.get('desc', []))
-                    higher_level = '\n'.join(json.get('higher_level', []))
+                    desc = '\n\n'.join(json.get('desc', []))
+                    description = desc
+                    higher_level = json.get('higher_level', [])
+                    if len(higher_level) > 0:
+                        description = description + '\n\n**At Higher Levels.** ' + '\n\n'.join(higher_level)
                     material = json.get('material')
-                    description = f'{desc}\n\n**At Higher Levels.** {higher_level}\n\n**Material.** {material}'
+                    if material != None:
+                        description = description + '\n\n**Material.** ' + material
 
-                    embed = discord.Embed(title=f'Spell: {name}', color=(await ctx.embed_colour()))
-                    embed.add_field(name="Name", value=name)
+                    embed = discord.Embed(title=f'Spell: {name}', description=description, color=(await ctx.embed_colour()))
                     embed.add_field(name="Level", value=json.get('level'))
                     embed.add_field(name="Casting Time", value=json.get('casting_time'))
                     embed.add_field(name="Range/Area", value=json.get('range'))
@@ -35,7 +38,6 @@ class Dnd(commands.Cog):
                     embed.add_field(name="School", value=json.get('school', {}).get('name'))
                     embed.add_field(name="Attack/Save", value=json.get('attack_type'))
                     embed.add_field(name="Damage/Effect", value=json.get('damage', {}).get('damage_type', {}).get('name'))
-                    embed.add_field(name="Description", value=description)
                     return await ctx.send(embed=embed)
                 elif resp.status == 404:
                     return await ctx.send(f'Could not find spell {spell}')

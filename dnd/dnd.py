@@ -99,7 +99,7 @@ class Dnd(commands.Cog):
                     json = await resp.json()
                     desc = ', '.join(list(map(lambda c: c.get('name'), json.get('results', []))))
 
-                    embed = discord.Embed(title=f'Spells', description=desc, color=(await ctx.embed_colour()))
+                    embed = discord.Embed(title=f'Spells: Level {level}', description=desc, color=(await ctx.embed_colour()))
                     return await ctx.send(embed=embed)
                 else:
                     return await ctx.send('Oops! Something went wrong listing spells.')

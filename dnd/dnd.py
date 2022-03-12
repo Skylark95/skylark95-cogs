@@ -12,6 +12,42 @@ class Dnd(commands.Cog):
         self.bot = bot
 
     @commands.command()
+    async def conditions(self, ctx: commands.Context):
+        """List conditions"""
+        try:
+            async with aiohttp.request('GET', f'{BASE_URL}/conditions', headers=HEADERS) as resp:
+                if resp.status == 200:
+                    json = await resp.json()
+                    desc = ', '.join(list(map(lambda c: c.get('name'), json.get('results', []))))
+
+                    embed = discord.Embed(title=f'Conditions', description=desc, color=(await ctx.embed_colour()))
+                    return await ctx.send(embed=embed)
+                else:
+                    return await ctx.send('Oops! Something went wrong listing conditions.')
+        except aiohttp.aiohttp.ClientConnectionError: 
+            return await ctx.send('Oops! Something went wrong listing conditions.')
+
+    @commands.command()
+    async def condition(self, ctx: commands.Context, *, condition: str):
+        """Get info about a condition"""
+        index = condition.lower()
+        try:
+            async with aiohttp.request('GET', f'{BASE_URL}/conditions/{index}', headers=HEADERS) as resp:
+                if resp.status == 200:
+                    json = await resp.json()
+                    name = json.get('name')
+                    desc = '\n\n'.join(json.get('desc', []))
+
+                    embed = discord.Embed(title=f'Condition: {name}', description=desc, color=(await ctx.embed_colour()))
+                    return await ctx.send(embed=embed)
+                elif resp.status == 404:
+                    return await ctx.send(f'Could not find condition {condition}')
+                else:
+                    return await ctx.send('Oops! Something went wrong finding conditions.')
+        except aiohttp.aiohttp.ClientConnectionError: 
+            return await ctx.send('Oops! Something went wrong finding conditions.')
+
+    @commands.command()
     async def spell(self, ctx: commands.Context, *, spell: str):
         """Get info about a spell"""
         index = spell.lower().replace(' ', '-')

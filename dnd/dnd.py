@@ -4,6 +4,7 @@ import aiohttp
 
 BASE_URL = 'https://www.dnd5eapi.co/api'
 HEADERS = {'Accept': 'application/json'}
+
 class Dnd(commands.Cog):
     """Interact with dnd5eapi.co"""
 
@@ -86,6 +87,13 @@ class Dnd(commands.Cog):
     async def spells(self, ctx: commands.Context, *, level: str):
         """List spells by level"""
         try:
+            level_num = int(level)
+            if level_num < 0 or level_num > 9:
+                return await ctx.send("Spell level must be between 0-9")
+        except ValueError:
+            return await ctx.send("Spell level must be numeric")
+        
+        try:
             async with aiohttp.request('GET', f'{BASE_URL}/spells/?level={level}', headers=HEADERS) as resp:
                 if resp.status == 200:
                     json = await resp.json()
@@ -93,13 +101,10 @@ class Dnd(commands.Cog):
 
                     embed = discord.Embed(title=f'Spells', description=desc, color=(await ctx.embed_colour()))
                     return await ctx.send(embed=embed)
-                elif resp.status == 404:
-                    return await ctx.send(f'Could not list spells')
                 else:
                     return await ctx.send('Oops! Something went wrong listing spells.')
         except aiohttp.ClientConnectionError:
             return await ctx.send('Oops! Something went wrong listing spells.')
-
 
     @commands.command()
     async def spell(self, ctx: commands.Context, *, spell: str):

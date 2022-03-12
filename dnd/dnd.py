@@ -125,6 +125,16 @@ class Dnd(commands.Cog):
                     if material != None:
                         desc = desc + '\n\n**Material.** ' + material
 
+                    duration = json.get('duration', '')
+                    concentration = json.get('concentration', False)
+                    if concentration:
+                        duration = 'Concentration, ' + duration
+                    
+                    school = json.get('school', {}).get('name')
+                    ritual = json.get('ritual', False)
+                    if ritual:
+                        school = school + ' (Ritual)'
+
                     classes = ', '.join(list(map(lambda c: c.get('name'), json.get('classes', []))))
 
                     embed = discord.Embed(title=f'Spell: {name}', description=desc, color=(await ctx.embed_colour()))
@@ -132,9 +142,8 @@ class Dnd(commands.Cog):
                     embed.add_field(name="Casting Time", value=json.get('casting_time'))
                     embed.add_field(name="Range/Area", value=json.get('range'))
                     embed.add_field(name="Components", value=','.join(json.get('components', [])))
-                    embed.add_field(name="Duration", value=json.get('duration'))
-                    embed.add_field(name="School", value=json.get('school', {}).get('name'))
-                    embed.add_field(name="Attack/Save", value=json.get('attack_type'))
+                    embed.add_field(name="Duration", value=duration)
+                    embed.add_field(name="School", value=school)
                     embed.add_field(name="Damage/Effect", value=json.get('damage', {}).get('damage_type', {}).get('name'))
                     embed.add_field(name="Classes", value=classes)
                     return await ctx.send(embed=embed)

@@ -1,7 +1,6 @@
 from redbot.core import commands
 import discord
 import aiohttp
-import asyncio
 
 BASE_URL = 'https://www.dnd5eapi.co/api'
 HEADERS = {'Accept': 'application/json'}
@@ -46,7 +45,6 @@ class Dnd(commands.Cog):
                     return await ctx.send('Oops! Something went wrong finding magic schools.')
         except aiohttp.aiohttp.ClientConnectionError: 
             return await ctx.send('Oops! Something went wrong finding magic schools.')
-
 
     @commands.command()
     async def conditions(self, ctx: commands.Context):
@@ -122,4 +120,3 @@ class Dnd(commands.Cog):
                     return await ctx.send('Oops! Something went wrong finding spells.')
         except aiohttp.ClientConnectionError:
             return await ctx.send('Oops! Something went wrong finding spells.')
-

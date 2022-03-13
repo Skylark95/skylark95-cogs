@@ -217,3 +217,15 @@ class Dnd(commands.Cog):
                     return await ctx.send('Oops! Something went wrong finding spells.')
         except aiohttp.ClientConnectionError:
             return await ctx.send('Oops! Something went wrong finding spells.')
+
+    @commands.command(aliases=["heal"])
+    async def healing(self, ctx: commands.Context):
+        """Get info about Potions of Healing"""
+        desc = "Potion, varies\n\nYou regain hit points when you drink this potion. The number of hit points depends on the potion's rarity, " \
+            "as shown in the Potions of Healing table. Whatever its potency, the potion's red liquid glimmers when agitated."
+        embed = discord.Embed(title='Potions of Healing (table)', description=desc, color=(await ctx.embed_colour()))
+        embed.add_field(name="Healing", value="2d4 + 2")
+        embed.add_field(name="Greater healing", value="4d4 + 4")
+        embed.add_field(name="Superior healing", value="8d4 + 8")
+        embed.add_field(name="Supreme healing", value="10d4 + 20")
+        return await ctx.send(embed=embed)

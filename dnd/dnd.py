@@ -13,7 +13,10 @@ class Dnd(commands.Cog):
 
     @commands.command(aliases=['magics'])
     async def schools(self, ctx: commands.Context):
-        """List magic schools"""
+        """List magic schools
+        
+        Do `[p]school <magic_school>` to get info about magic school
+        """
         try:
             async with aiohttp.request('GET', f'{BASE_URL}/magic-schools', headers=HEADERS) as resp:
                 if resp.status == 200:
@@ -28,9 +31,13 @@ class Dnd(commands.Cog):
             return await ctx.send('Oops! Something went wrong listing magic schools.')
 
     @commands.command(aliases=['magic'])
-    async def school(self, ctx: commands.Context, *, school: str):
-        """Get info about a magic school"""
-        index = school.lower()
+    async def school(self, ctx: commands.Context, *, magic_school: str):
+        """Get info about a magic school
+        
+        `magic_school` is the name of the magic school
+        Do `[p]schools` to list possible magic schools
+        """
+        index = magic_school.lower()
         try:
             async with aiohttp.request('GET', f'{BASE_URL}/magic-schools/{index}', headers=HEADERS) as resp:
                 if resp.status == 200:
@@ -41,7 +48,7 @@ class Dnd(commands.Cog):
                     embed = discord.Embed(title=f'Magic School: {name}', description=desc, color=(await ctx.embed_colour()))
                     return await ctx.send(embed=embed)
                 elif resp.status == 404:
-                    return await ctx.send(f'Could not find magic school {school}')
+                    return await ctx.send(f'Could not find magic school {magic_school}')
                 else:
                     return await ctx.send('Oops! Something went wrong finding magic schools.')
         except aiohttp.aiohttp.ClientConnectionError: 
@@ -49,7 +56,10 @@ class Dnd(commands.Cog):
 
     @commands.command()
     async def conditions(self, ctx: commands.Context):
-        """List conditions"""
+        """List conditions
+        
+        Do `[p]condition <condition>` to get info about a condition
+        """
         try:
             async with aiohttp.request('GET', f'{BASE_URL}/conditions', headers=HEADERS) as resp:
                 if resp.status == 200:
@@ -65,7 +75,11 @@ class Dnd(commands.Cog):
 
     @commands.command()
     async def condition(self, ctx: commands.Context, *, condition: str):
-        """Get info about a condition"""
+        """Get info about a condition
+        
+        `condition` is the name of the condition
+        Do `[p]conditions` to list possible conditions
+        """
         index = condition.lower()
         try:
             async with aiohttp.request('GET', f'{BASE_URL}/conditions/{index}', headers=HEADERS) as resp:
@@ -85,7 +99,10 @@ class Dnd(commands.Cog):
 
     @commands.command()
     async def classes(self, ctx: commands.Context):
-        """List character classes"""
+        """List character classes
+        
+        Do `[p]spells <level> [character_class]` to list spells for a class
+        """
         try:
             async with aiohttp.request('GET', f'{BASE_URL}/classes', headers=HEADERS) as resp:
                 if resp.status == 200:
@@ -101,7 +118,13 @@ class Dnd(commands.Cog):
 
     @commands.command()
     async def spells(self, ctx: commands.Context, level: str, *, character_class = ""):
-        """List spells by level and optionally class"""
+        """List spells by level and optionally class
+        
+        `level` is the level of the spell (required)
+        `character_class` is the class to list spells for (optional)
+        Do `[p]classes` to list possible character classes
+        Do `[p]spell <spell_name>` to get info about a spell
+        """
         try:
             level_num = int(level)
             if level_num < 0 or level_num > 9:
@@ -144,9 +167,13 @@ class Dnd(commands.Cog):
             return await ctx.send('Oops! Something went wrong listing spells.')
 
     @commands.command()
-    async def spell(self, ctx: commands.Context, *, spell: str):
-        """Get info about a spell"""
-        index = spell.lower().replace(' ', '-')
+    async def spell(self, ctx: commands.Context, *, spell_name: str):
+        """Get info about a spell
+        
+        `spell_name` is the name of the spell
+        Do `[p]spells <level> [character_class]` to list possible spells
+        """
+        index = spell_name.lower().replace(' ', '-')
         try:
             async with aiohttp.request('GET', f'{BASE_URL}/spells/{index}', headers=HEADERS) as resp:
                 if resp.status == 200:
@@ -185,7 +212,7 @@ class Dnd(commands.Cog):
                     embed.add_field(name="Classes", value=classes)
                     return await ctx.send(embed=embed)
                 elif resp.status == 404:
-                    return await ctx.send(f'Could not find spell {spell}')
+                    return await ctx.send(f'Could not find spell {spell_name}')
                 else:
                     return await ctx.send('Oops! Something went wrong finding spells.')
         except aiohttp.ClientConnectionError:

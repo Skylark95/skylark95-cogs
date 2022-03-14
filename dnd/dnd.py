@@ -11,24 +11,27 @@ class Dnd(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    async def list_all(self, ctx: commands.Context, title: str, url_slug: str):
+        try:
+            async with aiohttp.request('GET', f'{BASE_URL}/{url_slug}', headers=HEADERS) as resp:
+                if resp.status == 200:
+                    json = await resp.json()
+                    desc = ', '.join(list(map(lambda c: c.get('name'), json.get('results', []))))
+
+                    embed = discord.Embed(title=title.capitalize(), description=desc, color=(await ctx.embed_colour()))
+                    return await ctx.send(embed=embed)
+                else:
+                    return await ctx.send(f'Oops! Something went wrong listing {title.lower()}.')
+        except aiohttp.aiohttp.ClientConnectionError: 
+            return await ctx.send(f'Oops! Something went wrong listing {title.lower()}.')
+
     @commands.command(aliases=['magics'])
     async def schools(self, ctx: commands.Context):
         """List magic schools
         
         Do `[p]school <magic_school>` to get info about magic school
         """
-        try:
-            async with aiohttp.request('GET', f'{BASE_URL}/magic-schools', headers=HEADERS) as resp:
-                if resp.status == 200:
-                    json = await resp.json()
-                    desc = ', '.join(list(map(lambda c: c.get('name'), json.get('results', []))))
-
-                    embed = discord.Embed(title=f'Conditions', description=desc, color=(await ctx.embed_colour()))
-                    return await ctx.send(embed=embed)
-                else:
-                    return await ctx.send('Oops! Something went wrong listing magic schools.')
-        except aiohttp.aiohttp.ClientConnectionError: 
-            return await ctx.send('Oops! Something went wrong listing magic schools.')
+        return await self.list_all(ctx, "magic schools", "magic-schools")
 
     @commands.command(aliases=['magic'])
     async def school(self, ctx: commands.Context, *, magic_school: str):
@@ -60,18 +63,7 @@ class Dnd(commands.Cog):
         
         Do `[p]condition <condition>` to get info about a condition
         """
-        try:
-            async with aiohttp.request('GET', f'{BASE_URL}/conditions', headers=HEADERS) as resp:
-                if resp.status == 200:
-                    json = await resp.json()
-                    desc = ', '.join(list(map(lambda c: c.get('name'), json.get('results', []))))
-
-                    embed = discord.Embed(title=f'Conditions', description=desc, color=(await ctx.embed_colour()))
-                    return await ctx.send(embed=embed)
-                else:
-                    return await ctx.send('Oops! Something went wrong listing conditions.')
-        except aiohttp.aiohttp.ClientConnectionError: 
-            return await ctx.send('Oops! Something went wrong listing conditions.')
+        return await self.list_all(ctx, "conditions", "conditions")
 
     @commands.command()
     async def condition(self, ctx: commands.Context, *, condition: str):
@@ -103,18 +95,7 @@ class Dnd(commands.Cog):
         
         Do `[p]spells <level> [character_class]` to list spells for a class
         """
-        try:
-            async with aiohttp.request('GET', f'{BASE_URL}/classes', headers=HEADERS) as resp:
-                if resp.status == 200:
-                    json = await resp.json()
-                    desc = ', '.join(list(map(lambda c: c.get('name'), json.get('results', []))))
-
-                    embed = discord.Embed(title=f'Classes', description=desc, color=(await ctx.embed_colour()))
-                    return await ctx.send(embed=embed)
-                else:
-                    return await ctx.send('Oops! Something went wrong listing character classes.')
-        except aiohttp.aiohttp.ClientConnectionError: 
-            return await ctx.send('Oops! Something went wrong listing character classes.')
+        return await self.list_all(ctx, "classes", "classes")
 
     @commands.command()
     async def spells(self, ctx: commands.Context, level: str, *, character_class = ""):

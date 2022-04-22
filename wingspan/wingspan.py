@@ -1,4 +1,3 @@
-from pytz import timezone
 from redbot.core import commands
 from datetime import datetime, timezone
 
@@ -14,4 +13,9 @@ class Wingspan(commands.Cog):
         date_today = datetime.now(timezone.utc)
         date_release = datetime(2022, 5, 2, 5, 0, 0, 0, timezone.utc)
         time_until = date_release - date_today
-        return await ctx.send(f'Wingspan: European Expansion will be released in **{time_until.days} days**')
+        days_until = time_until.days
+        if days_until > 0:
+            return await ctx.send(f'Wingspan: European Expansion will be released in **{days_until} days**')
+        if days_until == 0:
+            return await ctx.send('Wingspan: European Expansion will be released **today**')
+        return await ctx.send('Wingspan: European Expansion has been released, why are you not playing it?')

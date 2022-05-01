@@ -11,7 +11,7 @@ class Wingspan(commands.Cog):
     async def expansion(self, ctx: commands.Context):
         """Time until Wingspan European expansion is released"""
         date_today = datetime.now(timezone.utc)
-        date_release = datetime(2022, 5, 2, 5, 0, 0, 0, timezone.utc)
+        date_release = datetime(2022, 5, 5, 5, 0, 0, 0, timezone.utc)
         time_until = date_release - date_today
         days_until = time_until.days
         if days_until > 0:

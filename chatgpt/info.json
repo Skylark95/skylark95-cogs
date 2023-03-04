@@ -1,0 +1,10 @@
+{
+    "author": ["Skylark95"],
+    "description": "Send messages to ChatGPT",
+    "install_msg": "Send messages to ChatGPT",
+    "short": "Send messages to ChatGPT",
+    "tags": ["chatgpt", "openai"],
+    "requirements": ["openai"],
+    "type": "COG",
+    "end_user_data_statement": "This cog does not persistently store data or metadata about users. However, this cog does pass user data to an external API for the purposes of simulated conversation responses."
+}

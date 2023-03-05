@@ -2,6 +2,8 @@
 
 A collection of my personal cogs for use with [Red-DiscordBot](https://github.com/Cog-Creators/Red-DiscordBot).
 
+To add cogs to your instance run: `[p]repo add skylark95-cogs https://github.com/Skylark95/skylark95-cogs`
+
 ## ChatGPT
 Send messages to ChatGPT
 

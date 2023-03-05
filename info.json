@@ -1,0 +1,8 @@
+{
+    "author" : ["Skylark95"],
+    "install_msg" : "Thanks for checking out my cogs!\nFor issues, bugs, or suggestions open an issue on the GitHub repository: https://github.com/Skylark95/skylark95-cogs",
+    "name" : "skylark95-cogs",
+    "short" : "Cogs by Skylark95.",
+    "description" : "Cogs by Skylark95. A collection of my personal cogs for use with Red-DiscordBot.",
+    "tags" : ["chatgpt", "openai", "dnd"]
+}

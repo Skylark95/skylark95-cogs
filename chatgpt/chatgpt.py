@@ -34,13 +34,14 @@ class ChatGPT(commands.Cog):
     @commands.command(aliases=['chat'])
     async def chatgpt(self, ctx: commands.Context, *, message: str):
         """Send a message to ChatGPT"""
-        reply = await self.do_chatgpt(ctx, message)
+        await self.do_chatgpt(ctx, message)
 
     async def do_chatgpt(self, ctx: commands.Context, message: str = None):
         await ctx.trigger_typing()
         openai_api_key = await self.config.openai_api_key()
         if openai_api_key == None:
-            await ctx.send("ChatGPT api key not set.")
+            prefix = ctx.prefix if ctx.prefix else "[p]"
+            await ctx.send(f"ChatGPT API key not set. See `{prefix}setchatgptkey` to set one.")
             return
         model = await self.config.model()
         if model == None:
@@ -95,6 +96,8 @@ class ChatGPT(commands.Cog):
     @commands.command()
     @checks.is_owner()
     async def setchatgptkey(self, ctx: commands.Context, api_key: str):
-        """Set the api key for ChatGPT"""
+        """Set the API key for ChatGPT.
+        
+        See https://platform.openai.com/account/api-keys to get an API key."""
         await self.config.openai_api_key.set(api_key)
         await ctx.send("ChatGPT api key set.")

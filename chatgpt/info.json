@@ -1,7 +1,7 @@
 {
     "author": ["Skylark95"],
     "description": "Send messages to ChatGPT",
-    "install_msg": "Send messages to ChatGPT",
+    "install_msg": "Requires an OpenAI API key. See `[p]setchatgptkey`.",
     "short": "Send messages to ChatGPT",
     "tags": ["chatgpt", "openai"],
     "requirements": ["openai"],

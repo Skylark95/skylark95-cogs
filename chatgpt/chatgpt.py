@@ -48,7 +48,6 @@ class ChatGPT(commands.Cog):
             return
         messages = []
         await self.build_messages(ctx, messages, ctx.message, message)
-        print(messages)
         reply = await self.call_api(
             model=model,
             api_key=openai_api_key,

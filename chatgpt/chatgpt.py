@@ -32,11 +32,11 @@ class ChatGPT(commands.Cog):
             await self.do_chatgpt(ctx)
 
     @commands.command(aliases=['chat'])
-    async def chatgpt(self, ctx: commands.Context):
+    async def chatgpt(self, ctx: commands.Context, *, message: str):
         """Send a message to ChatGPT"""
-        reply = await self.do_chatgpt(ctx)
+        reply = await self.do_chatgpt(ctx, message)
 
-    async def do_chatgpt(self, ctx: commands.Context):
+    async def do_chatgpt(self, ctx: commands.Context, message: str = None):
         await ctx.trigger_typing()
         openai_api_key = await self.config.openai_api_key()
         if openai_api_key == None:
@@ -47,7 +47,8 @@ class ChatGPT(commands.Cog):
             await ctx.send("ChatGPT model not set.")
             return
         messages = []
-        await self.build_messages(ctx, messages, ctx.message)
+        await self.build_messages(ctx, messages, ctx.message, message)
+        print(messages)
         reply = await self.call_api(
             model=model,
             api_key=openai_api_key,
@@ -58,15 +59,15 @@ class ChatGPT(commands.Cog):
             reference=ctx.message
         )
 
-    async def build_messages(self, ctx: commands.Context, messages: list[Message], message: Message):
+    async def build_messages(self, ctx: commands.Context, messages: list[Message], message: Message, messageText: str = None):
         role = "assistant" if message.author.id == self.bot.user.id else "user"
-        content = message.clean_content
+        content = messageText if messageText else message.clean_content
         to_strip = f"(?m)^(<@!?{self.bot.user.id}>)"
         is_mention = re.search(to_strip, message.content)
         if is_mention:
             content = content[len(ctx.me.display_name) + 2 :]
         if role == "user" and content.startswith('chat '):
-            content = content[4:]
+            content = content[5:]
         messages.insert(0, {"role": role, "content": content })
         if message.reference and message.reference.resolved:
             await self.build_messages(ctx, messages, message.reference.resolved)

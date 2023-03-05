@@ -7,10 +7,14 @@ To add cogs to your instance run: `[p]repo add skylark95-cogs https://github.com
 ## ChatGPT
 Send messages to ChatGPT
 
-| Command       | Description                 |
-| ------------- | --------------------------- |
-| chatgpt       | Send a message to ChatGPT   |
-| setchatgptkey | Set the api key for ChatGPT |
+| Command              | Description                            |
+| -------------------- | -------------------------------------- |
+| chatgpt              | Send a message to ChatGPT.             |
+| getchatgptmodel      | Get the model for ChatGPT.             |
+| setchatgptkey        | Set the API key for ChatGPT.           |
+| setchatgptmodel      | Set the model for ChatGPT.             |
+| togglechatgptmention | Toggle messages to ChatGPT on mention. |
+| togglechatgptreply   | Toggle messages to ChatGPT on reply.   |
 
 ## Dnd
 Interact with [dnd5eapi.co](https://www.dnd5eapi.co/)

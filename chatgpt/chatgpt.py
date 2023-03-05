@@ -11,7 +11,9 @@ class ChatGPT(commands.Cog):
         self.config = Config.get_conf(self, identifier=359554929893)
         default_global = {
             "openai_api_key": None,
-            "model": "gpt-3.5-turbo"
+            "model": "gpt-3.5-turbo",
+            "mention": True,
+            "reply": True,
         }
         self.config.register_global(**default_global)
     
@@ -19,12 +21,17 @@ class ChatGPT(commands.Cog):
     async def on_message(self, message: Message):
         if message.author.bot:
             return
+
+        config_mention = await self.config.mention()
+        config_reply = await self.config.reply()
+        if not config_mention and not config_reply:
+            return
+
         ctx: commands.Context = await self.bot.get_context(message)
-        text = message.clean_content
         to_strip = f"(?m)^(<@!?{self.bot.user.id}>)"
-        is_mention = re.search(to_strip, message.content)
+        is_mention = config_mention and re.search(to_strip, message.content)
         is_reply = False
-        if message.reference and message.reference.resolved:
+        if config_reply and message.reference and message.reference.resolved:
             author = getattr(message.reference.resolved, "author")
             if author is not None:
                 is_reply = message.reference.resolved.author.id == self.bot.user.id and ctx.me in message.mentions
@@ -119,3 +126,29 @@ class ChatGPT(commands.Cog):
         Defaults to `gpt-3.5-turbo` See https://platform.openai.com/docs/models/gpt-3-5 for a list of models."""
         await self.config.model.set(model)
         await ctx.send("ChatGPT model set.")
+
+    @commands.command()
+    @checks.is_owner()
+    async def togglechatgptmention(self, ctx: commands.Context):
+        """Toggle messages to ChatGPT on mention.
+        
+        Defaults to `True`."""
+        mention = not await self.config.mention()
+        await self.config.mention.set(mention)
+        if mention:
+            await ctx.send("Enabled sending messages to ChatGPT on bot mention.")
+        else:
+            await ctx.send("Disabled sending messages to ChatGPT on bot mention.")
+
+    @commands.command()
+    @checks.is_owner()
+    async def togglechatgptreply(self, ctx: commands.Context):
+        """Toggle messages to ChatGPT on reply.
+        
+        Defaults to `True`."""
+        reply = not await self.config.reply()
+        await self.config.reply.set(reply)
+        if reply:
+            await ctx.send("Enabled sending messages to ChatGPT on bot reply.")
+        else:
+            await ctx.send("Disabled sending messages to ChatGPT on bot reply.")

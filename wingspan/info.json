@@ -1,5 +1,6 @@
 {
     "author": ["Skylark95"],
+    "name": "Wingspan",
     "description": "Wingspan game related commands",
     "install_msg": "Wingspan game related commands",
     "short": "Wingspan game related commands",

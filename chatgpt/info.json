@@ -1,5 +1,6 @@
 {
     "author": ["Skylark95"],
+    "name": "ChatGPT",
     "description": "Send messages to ChatGPT",
     "install_msg": "Requires an OpenAI API key. See `[p]setchatgptkey`.",
     "short": "Send messages to ChatGPT",

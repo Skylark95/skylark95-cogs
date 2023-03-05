@@ -1,5 +1,6 @@
 {
     "author": ["Skylark95"],
+    "name": "Dnd",
     "description": "Interact with dnd5eapi.co",
     "install_msg": "Interact with dnd5eapi.co",
     "short": "Interact with dnd5eapi.co",

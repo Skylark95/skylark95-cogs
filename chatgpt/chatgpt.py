@@ -33,7 +33,7 @@ class ChatGPT(commands.Cog):
 
     @commands.command(aliases=['chat'])
     async def chatgpt(self, ctx: commands.Context, *, message: str):
-        """Send a message to ChatGPT"""
+        """Send a message to ChatGPT."""
         await self.do_chatgpt(ctx, message)
 
     async def do_chatgpt(self, ctx: commands.Context, message: str = None):
@@ -101,3 +101,21 @@ class ChatGPT(commands.Cog):
         See https://platform.openai.com/account/api-keys to get an API key."""
         await self.config.openai_api_key.set(api_key)
         await ctx.send("ChatGPT api key set.")
+
+    @commands.command()
+    @checks.is_owner()
+    async def getchatgptmodel(self, ctx: commands.Context):
+        """Get the model for ChatGPT.
+        
+        Defaults to `gpt-3.5-turbo` See https://platform.openai.com/docs/models/gpt-3-5 for a list of models."""
+        model = await self.config.model()
+        await ctx.send(f"ChatGPT model set to `{model}`")
+
+    @commands.command()
+    @checks.is_owner()
+    async def setchatgptmodel(self, ctx: commands.Context, model: str):
+        """Set the model for ChatGPT.
+        
+        Defaults to `gpt-3.5-turbo` See https://platform.openai.com/docs/models/gpt-3-5 for a list of models."""
+        await self.config.model.set(model)
+        await ctx.send("ChatGPT model set.")

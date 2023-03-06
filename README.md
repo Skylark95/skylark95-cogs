@@ -11,7 +11,6 @@ Send messages to ChatGPT
 | -------------------- | -------------------------------------- |
 | chatgpt              | Send a message to ChatGPT.             |
 | getchatgptmodel      | Get the model for ChatGPT.             |
-| setchatgptkey        | Set the API key for ChatGPT.           |
 | setchatgptmodel      | Set the model for ChatGPT.             |
 | togglechatgptmention | Toggle messages to ChatGPT on mention. |
 | togglechatgptreply   | Toggle messages to ChatGPT on reply.   |

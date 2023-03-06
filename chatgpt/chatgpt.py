@@ -16,6 +16,17 @@ class ChatGPT(commands.Cog):
             "reply": True,
         }
         self.config.register_global(**default_global)
+
+    async def openai_api_key(self):
+        openai_keys = await self.bot.get_shared_api_tokens("openai")
+        openai_api_key = openai_keys.get("api_key")
+        if openai_api_key is None:
+            # Migrate key from config if exists
+            openai_api_key = await self.config.openai_api_key()
+            if openai_api_key is not None:
+                await self.bot.set_shared_api_tokens("openai", api_key=openai_api_key)
+                await self.config.openai_api_key.set(None)
+        return openai_api_key
     
     @commands.Cog.listener()
     async def on_message(self, message: Message):
@@ -45,10 +56,10 @@ class ChatGPT(commands.Cog):
 
     async def do_chatgpt(self, ctx: commands.Context, message: str = None):
         await ctx.trigger_typing()
-        openai_api_key = await self.config.openai_api_key()
+        openai_api_key = await self.openai_api_key()
         if openai_api_key == None:
             prefix = ctx.prefix if ctx.prefix else "[p]"
-            await ctx.send(f"ChatGPT API key not set. See `{prefix}setchatgptkey` to set one.")
+            await ctx.send(f"OpenAI API key not set. Use `{prefix}set api openai api_key <value>`.\nAn API key may be acquired from: https://platform.openai.com/account/api-keys.")
             return
         model = await self.config.model()
         if model == None:
@@ -99,15 +110,6 @@ class ChatGPT(commands.Cog):
             return f"OpenAI API request exceeded rate limit: {e}"
         except openai.error.AuthenticationError as e:
             return f"OpenAI API returned an Authentication Error: {e}"
-
-    @commands.command()
-    @checks.is_owner()
-    async def setchatgptkey(self, ctx: commands.Context, api_key: str):
-        """Set the API key for ChatGPT.
-        
-        See https://platform.openai.com/account/api-keys to get an API key."""
-        await self.config.openai_api_key.set(api_key)
-        await ctx.send("ChatGPT api key set.")
 
     @commands.command()
     @checks.is_owner()

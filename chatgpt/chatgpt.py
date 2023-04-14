@@ -12,6 +12,7 @@ class ChatGPT(commands.Cog):
         default_global = {
             "openai_api_key": None,
             "model": "gpt-3.5-turbo",
+            "max_tokens": 400,
             "mention": True,
             "reply": True,
         }
@@ -65,12 +66,17 @@ class ChatGPT(commands.Cog):
         if model == None:
             await ctx.send("ChatGPT model not set.")
             return
+        max_tokens = await self.config.max_tokens()
+        if max_tokens == None:
+            await ctx.send("ChatGPT max_tokens not set.")
+            return
         messages = []
         await self.build_messages(ctx, messages, ctx.message, message)
         reply = await self.call_api(
             model=model,
             api_key=openai_api_key,
-            messages=messages
+            messages=messages,
+            max_tokens=max_tokens
         )
         await ctx.send(
             content=reply,
@@ -90,12 +96,13 @@ class ChatGPT(commands.Cog):
         if message.reference and message.reference.resolved:
             await self.build_messages(ctx, messages, message.reference.resolved)
 
-    async def call_api(self, messages, model: str, api_key: str):
+    async def call_api(self, messages, model: str, api_key: str, max_tokens: int):
         openai.api_key = api_key
         try: 
             response = openai.ChatCompletion.create(
                 model=model,
-                messages=messages
+                messages=messages,
+                max_tokens=max_tokens
             )
             reply = response['choices'][0]['message']['content']
             if not reply:
@@ -128,6 +135,27 @@ class ChatGPT(commands.Cog):
         Defaults to `gpt-3.5-turbo` See https://platform.openai.com/docs/models/gpt-3-5 for a list of models."""
         await self.config.model.set(model)
         await ctx.send("ChatGPT model set.")
+
+    @commands.command()
+    @checks.is_owner()
+    async def getchatgpttokens(self, ctx: commands.Context):
+        """Get the maximum number of tokens for ChatGPT to generate.
+        
+        Defaults to `400` See https://platform.openai.com/tokenizer for more details."""
+        model = await self.config.max_tokens()
+        await ctx.send(f"ChatGPT maximum number of tokens set to `{model}`")
+
+    @commands.command()
+    @checks.is_owner()
+    async def setchatgpttokens(self, ctx: commands.Context, number: str):
+        """Set the maximum number of tokens for ChatGPT to generate.
+        
+        Defaults to `400` See https://platform.openai.com/tokenizer for more details."""
+        try:
+            await self.config.max_tokens.set(int(number))
+            await ctx.send("ChatGPT maximum number of tokens set.")
+        except ValueError:
+            await ctx.send("Invalid numeric value for maximum number of tokens.")
 
     @commands.command()
     @checks.is_owner()

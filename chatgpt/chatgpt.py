@@ -56,7 +56,7 @@ class ChatGPT(commands.Cog):
         await self.do_chatgpt(ctx, message)
 
     async def do_chatgpt(self, ctx: commands.Context, message: str = None):
-        await ctx.trigger_typing()
+        await ctx.typing()
         openai_api_key = await self.openai_api_key()
         if openai_api_key == None:
             prefix = ctx.prefix if ctx.prefix else "[p]"

@@ -1,5 +1,6 @@
 from discord import Message
 from redbot.core import Config, checks, commands
+from typing import List
 import openai
 import re
 
@@ -83,7 +84,7 @@ class ChatGPT(commands.Cog):
             reference=ctx.message
         )
 
-    async def build_messages(self, ctx: commands.Context, messages: list[Message], message: Message, messageText: str = None):
+    async def build_messages(self, ctx: commands.Context, messages: List[Message], message: Message, messageText: str = None):
         role = "assistant" if message.author.id == self.bot.user.id else "user"
         content = messageText if messageText else message.clean_content
         to_strip = f"(?m)^(<@!?{self.bot.user.id}>)"

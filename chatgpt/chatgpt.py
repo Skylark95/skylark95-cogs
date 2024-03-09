@@ -2,6 +2,8 @@ from discord import Message
 from redbot.core import Config, checks, commands
 from typing import List
 import openai
+from openai import OpenAI
+
 import re
 
 class ChatGPT(commands.Cog):
@@ -18,6 +20,7 @@ class ChatGPT(commands.Cog):
             "reply": True,
         }
         self.config.register_global(**default_global)
+        self.client = None
 
     async def openai_api_key(self):
         openai_keys = await self.bot.get_shared_api_tokens("openai")
@@ -98,26 +101,26 @@ class ChatGPT(commands.Cog):
             await self.build_messages(ctx, messages, message.reference.resolved)
 
     async def call_api(self, messages, model: str, api_key: str, max_tokens: int):
-        openai.api_key = api_key
         try: 
-            response = openai.ChatCompletion.create(
-                model=model,
-                messages=messages,
-                max_tokens=max_tokens
-            )
-            reply = response['choices'][0]['message']['content']
+            if self.client == None:
+                self.client = OpenAI(api_key=api_key)
+            self.client.api_key = api_key
+            response = self.client.chat.completions.create(model=model,
+            messages=messages,
+            max_tokens=max_tokens)
+            reply = response.choices[0].message.content
             if not reply:
                 return "The message from ChatGPT was empty."
             else:
                 return reply
-        except openai.error.APIError as e:
-            return f"OpenAI API returned an API Error: {e}"
-        except openai.error.APIConnectionError as e:
+        except openai.APIConnectionError as e:
             return f"Failed to connect to OpenAI API: {e}"
-        except openai.error.RateLimitError as e:
+        except openai.RateLimitError as e:
             return f"OpenAI API request exceeded rate limit: {e}"
-        except openai.error.AuthenticationError as e:
+        except openai.AuthenticationError as e:
             return f"OpenAI API returned an Authentication Error: {e}"
+        except openai.APIError as e:
+            return f"OpenAI API returned an API Error: {e}"
 
     @commands.command()
     @checks.is_owner()

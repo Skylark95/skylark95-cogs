@@ -1,0 +1,11 @@
+{
+    "author": ["Skylark95"],
+    "name": "Wingspan",
+    "description": "Wingspan game related commands",
+    "install_msg": "Wingspan game related commands",
+    "short": "Wingspan game related commands",
+    "tags": ["wingspan"],
+    "type": "COG",
+    "end_user_data_statement": "This cog does not persistently store data or metadata about users.",
+    "min_bot_version": "3.5.0"
+}

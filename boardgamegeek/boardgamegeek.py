@@ -50,17 +50,27 @@ class BoardGameGeek(commands.Cog):
         async with aiohttp.request('GET', f'{baseUrl}/thing', params=params) as resp:
             text = await resp.text()
             root = ET.fromstring(text)
+
             name = self.value(root, './item/name')
             description = self.text(root, './item/description')
+            thumbnail = self.text(root, './item/thumbnail')
             year = self.value(root, './item/yearpublished')
             players = self.players(root)
+            playing_time = self.playing_time(root)
             average_rating = self.round_value(root, './item/statistics/ratings/average')
             average_weight = self.round_value(root, './item/statistics/ratings/averageweight')
+            publisher = self.value(root, './item/link[@type="boardgamepublisher"]')
+            url = f"https://boardgamegeek.com/boardgame/{id}"
+
             embed = discord.Embed(title=name, description=description, color=(await ctx.embed_colour()))
+            embed.set_thumbnail(url=thumbnail)
+            embed.add_field(name="Average Rating", value=average_rating)
             embed.add_field(name="Year Published", value=year)
             embed.add_field(name="Players", value=players)
-            embed.add_field(name="Average Rating", value=average_rating)
+            embed.add_field(name="Playing Time", value=playing_time)
             embed.add_field(name="Average Weight", value=average_weight)
+            embed.add_field(name="Publisher", value=publisher)
+            embed.add_field(name="More Info", value=f"[BoardGameGeek]({url})")
             return embed
 
     def text(self, root, path):
@@ -68,6 +78,11 @@ class BoardGameGeek(commands.Cog):
         if element is not None:
             return html.unescape(element.text) if element.text else None
         return None
+
+    def playing_time(self, root):
+        min = self.value(root, './item/minplaytime')
+        max = self.value(root, './item/maxplaytime')
+        return f"{min} - {max}"
 
     def players(self, root):
         min = self.value(root, './item/minplayers')

@@ -1,0 +1,11 @@
+{
+    "author": ["Skylark95"],
+    "name": "BoardGameGeek",
+    "description": "Look up board games on BoardGameGeek",
+    "install_msg": "Look up board games on BoardGameGeek",
+    "short": "Look up board games on BoardGameGeek",
+    "tags": ["boardgamegeek", "bgg"],
+    "type": "COG",
+    "end_user_data_statement": "This cog does not persistently store data or metadata about users.",
+    "min_bot_version": "3.5.0"
+}

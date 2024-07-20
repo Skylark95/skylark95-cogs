@@ -25,25 +25,46 @@ class BoardGameGeek(commands.Cog):
         """
         try:
             id = await self.search(query)
-            if id is None:
+            if id == None:
+                results = await self.search(query, 0)
+                if results != None:
+                    msg = "Multiple results found: \n"
+                    for result in results:
+                        name = result['name']
+                        if result['yearpublished'] > 0:
+                            year = result['yearpublished']
+                            name = f"{name} ({year})"
+                        if len(msg) + len(name) > 2000:
+                            return await ctx.send(msg)
+                        msg += f"* {name}\n"
+                    return await ctx.send(msg)
                 return await ctx.send("No results found")
             embed = await self.thing(ctx, id)
             return await ctx.send(embed=embed)
         except BoardGameGeekException as e:
             return await ctx.send(str(e))
 
-    async def search(self, query):
-        params = { 'exact': 1, 'query': query, 'type': 'boardgame,boardgameexpansion' }
+    async def search(self, query, exact=1):
+        params = { 'exact': exact, 'query': query, 'type': 'boardgame,boardgameexpansion' }
         async with aiohttp.request('GET', f'{baseUrl}/search', params=params) as resp:
             if resp.status != 200:
                 raise BoardGameGeekException(f"Error: {resp.status}")
             text = await resp.text()
             root = ET.fromstring(text)
-            item = root.find('./item')
-            if item is None:
-                return None
 
-            return item.attrib['id']
+            if exact is 1:
+                item = root.find('./item')
+                if item is None:
+                    return None
+
+                return item.attrib['id']
+            else:
+                items = root.findall('./item')
+                if len(items) == 0:
+                    return None
+                results = [{'name': self.value(item, './name'), 'yearpublished': int(self.value(item, './yearpublished', '0'))} for item in items]
+                results.sort(key=lambda x: x['yearpublished'], reverse=True)
+                return results
 
     async def thing(self, ctx, id):
         params = { 'id': id, 'stats': 1 }
@@ -89,11 +110,11 @@ class BoardGameGeek(commands.Cog):
         max = self.value(root, './item/maxplayers')
         return f"{min} - {max}"
 
-    def value(self, root, path):
+    def value(self, root, path, default = None):
         element = root.find(path)
         if element is not None:
             return element.attrib['value']
-        return None
+        return default
 
     def round_value(self, root, path):
         element = root.find(path)

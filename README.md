@@ -4,6 +4,13 @@ A collection of my personal cogs for use with [Red-DiscordBot](https://github.co
 
 To add cogs to your instance run: `[p]repo add skylark95-cogs https://github.com/Skylark95/skylark95-cogs`
 
+## BoardGameGeek
+Look up a board game on BoardGameGeek
+
+| Command       | Description                          |
+| ------------- | ------------------------------------ |
+| boardgamegeek | Lookup a board game on BoardGameGeek |
+
 ## ChatGPT
 Send messages to ChatGPT
 
@@ -28,6 +35,13 @@ Interact with [dnd5eapi.co](https://www.dnd5eapi.co/)
 | schools    | List magic schools                        |
 | spell      | Get info about a spell                    |
 | spells     | List spells by level and optionally class |
+
+## Gen Con
+Countdown to Gen Con
+
+| Command | Description          |
+| ------- | -------------------- |
+| gencon  | Countdown to Gen Con |
 
 ## Wingspan
 [Wingpsan](https://store.steampowered.com/app/1054490/Wingspan/) game related commands
